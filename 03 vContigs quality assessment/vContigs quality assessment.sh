@@ -20,12 +20,17 @@ awk -F"\t" '$9=$7-$6+1{split($1,array,"_");$10=array[length(array)];sub("_[0-9]{
 
 
 ### Bowtie2 v2.2.5 and Samtools v1.15.1
-## mapping metagenomic reads to putative RNA vContigs for verificaiton
+## mapping metagenomic reads to putative RNA vContigs and AMG for verificaiton
 
 bowtie2-build final_rdrp_contig.fna    bt2/final_rdrp_contig
 bowtie2 -p 6  -x bt2/final_rdrp_contig  -1 ${sample}_1.fq.gz -2 ${sample}_2.fq.gz | samtools view -q 30 -F 0x08 -b -f 0x2 | samtools sort -@ 5 >bt2bam/${sample}.bam 
+
+bowtie2-build final_rdrp_contig_amg.fna    bt2/final_rdrp_contig_amg
+bowtie2 -p 6  -x bt2/final_rdrp_contig_amg  -1 ${sample}_1.fq.gz -2 ${sample}_2.fq.gz | samtools view -q 30 -F 0x08 -b -f 0x2 | samtools sort -@ 5 >bt2bam/${sample}.bam 
 
 ## CoverM v0.6.1
 # filtering contigs with coverage >=75% and depth <= 1x
 coverm contig  --bam-files ${sample}.sorted.bam  -t 10  --methods covered_fraction -o process/${sample}_coverage.tsv 
 coverm contig  --bam-files ${sample}.sorted.bam   -t 10  --methods trimmed_mean  -o process/${sample}_trimmed_mean.tsv    
+
+
